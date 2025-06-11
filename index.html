@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Билеты по C++</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --main-color: #4a90e2;
+      --accent-color: #ff6b6b;
+      --bg-color: #f9fafc;
+      --text-color: #222;
+      --card-bg: #fff;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    header {
+      background: var(--main-color);
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    header h1 {
+      font-size: 26px;
+      margin: 0;
+    }
+
+    button {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 14px 22px;
+      margin: 5px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #ff4040;
+      transform: translateY(-2px);
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px;
+      padding: 30px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .card {
+      perspective: 1000px;
+      border-radius: 16px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      padding-top: 140%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      box-shadow: var(--shadow);
+      border-radius: 16px;
+      background: linear-gradient(135deg, #fff, #f1f4f9);
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      padding: 25px;
+      box-sizing: border-box;
+    }
+
+    .card-front {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 700;
+      font-size: 28px;
+      color: var(--main-color);
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      font-size: 16px;
+      overflow-y: auto;
+    }
+
+    .modal {
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+    }
+
+    @media(max-width: 600px) {
+      header h1 { font-size: 20px; }
+      button { font-size: 14px; padding: 10px 16px; }
+      .container { padding: 15px; }
+      .card-front { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Экзамен C++</h1>
+  <div>
+    <button onclick="showRules()">ПРАВИЛА</button>
+    <button onclick="randomTicket()">🎲 РАНДОМ</button>
+  </div>
+</header>
+
+<div class="container" id="cards"></div>
+
+<div class="modal" id="rulesModal">
+  <div class="modal-content">
+    <h2>Правила экзамена</h2>
+    <p>В каждом билете: 3 теории и 1 практика.<br> Счастливый билет: №7 🎉</p>
+    <p>Время здачи: 20 минут</p>
+    <p>Первые 10 минут на подготовку, следующие 10 защита</p>
+    <p>Никаких <strong>ПОДСКАЗОК</strong> не будет</p>
+    <button onclick="closeRules()">Закрыть</button>
+  </div>
+</div>
+
+<div class="modal" id="randomModal">
+  <div class="modal-content" id="randomContent"></div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+<script>
+  const tickets = [
+    { theory: ["Что такое массив?", "Что делает оператор break?", "Что делает команда git init?"], practice: "Реализовать сортировку пузырьком." },
+    { theory: ["Что делает оператор if?", "Для чего нужен switch?", "Что такое git add?"], practice: "Реализовать поиск минимума в массиве." },
+    { theory: ["Что такое вложенные циклы?", "Чем отличается if-else от switch?", "Что делает git push?"], practice: "Вывести таблицу умножения." },
+    { theory: ["Что делает while?", "Что такое логический оператор ||?", "Что такое git commit?"], practice: "Линейный поиск в массиве." },
+    { theory: ["Что такое статический массив?", "Что делает оператор continue?", "Что делает команда git clone?"], practice: "Посчитать сумму от 1 до N." },
+    { theory: ["Что такое do while?", "Что делает switch-case?", "Чем отличается git pull от git fetch?"], practice: "Сумма диагонали матрицы 3x3." },
+    { theory: ["Что такое динамический массив?", "Как выделять память динамически?", "Что делает git status?"], practice: "Динамический массив и сортировка выбором." },
+    { theory: ["Что делает for?", "Чем for отличается от while?", "Что делает git branch?"], practice: "Сумма элементов массива." },
+    { theory: ["Что такое ветвление?", "Для чего нужен break?", "Что делает git merge?"], practice: "Ввод чисел до 0, подсчитать сумму." },
+    { theory: ["Что такое логические операторы && и ||?", "Что делает вложенный if?", "Что делает git log?"], practice: "Проверить, простое ли число." },
+    { theory: ["Что такое двумерный массив?", "Что такое switch-case?", "Что делает git checkout?"], practice: "Вывести прямоугольник N x M из звёздочек." },
+    { theory: ["Что такое while?", "Что делает оператор continue?", "Что такое удалённый репозиторий в Git?"], practice: "Вывести чётные числа от 1 до N." },
+    { theory: ["Что такое if-else?", "Чем отличается статический массив от динамического?", "Что делает git log?"], practice: "Перевод баллов в оценки A/B/C/D/F." },
+    { theory: ["Что такое for?", "Что такое массив?", "Что такое pull request?"], practice: "Реверс массива." },
+    { theory: ["Что такое массив?", "Чем отличается статический массив от динамического?", "Что делает git remote add?"], practice: "Сортировка Quick Sort." },
+    { theory: ["Что такое массив?", "Что делает оператор continue?", "Что делает git reset?"], practice: "Вывести числа от 100 до 1." },
+    { theory: ["Что такое динамическое выделение памяти?", "Чем отличается break от continue?", "Что такое git conflict?"], practice: "Посчитать факториал числа." },
+    { theory: ["Как выйти из бесконечного цикла?", "Что делает ключевое слово delete?", "Что делает git stash?"], practice: "Бинарный поиск в отсортированном массиве." }
+  ];
+
+  const cardsContainer = document.getElementById('cards');
+  tickets.forEach((ticket, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-front">Билет ${i+1}</div>
+        <div class="card-back">
+          <strong>Теория:</strong><br>• ${ticket.theory.join("<br>• ")}<br><br>
+          <strong>Практика:</strong><br>${ticket.practice}
+        </div>
+      </div>`;
+    card.onclick = () => card.classList.toggle('flipped');
+    cardsContainer.appendChild(card);
+  });
+
+  function showRules() {
+    document.getElementById('rulesModal').style.display = 'flex';
+  }
+  function closeRules() {
+    document.getElementById('rulesModal').style.display = 'none';
+  }
+
+  function randomTicket() {
+    const i = Math.floor(Math.random() * tickets.length);
+    const t = tickets[i];
+    document.getElementById('randomContent').innerHTML = `
+      <h2>Случайный билет №${i+1}</h2>
+      <strong>Теория:</strong><br>• ${t.theory.join("<br>• ")}<br><br>
+      <strong>Практика:</strong><br>${t.practice}<br><br>
+      <button onclick="closeRandom()">Закрыть</button>`;
+    document.getElementById('randomModal').style.display = 'flex';
+
+    if (i === 6) { 
+      confetti({
+        particleCount: 200,
+        spread: 100,
+        origin: { y: 0.6 }
+      });
+    }
+  }
+
+  function closeRandom() {
+    document.getElementById('randomModal').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
